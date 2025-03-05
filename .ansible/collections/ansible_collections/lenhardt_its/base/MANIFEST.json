@@ -1,0 +1,33 @@
+{
+ "collection_info": {
+  "namespace": "lenhardt_its",
+  "name": "base",
+  "version": "1.0.0",
+  "authors": [
+   "Dominik Lenhardt <dominik@lenhardt.cc>"
+  ],
+  "readme": "README.md",
+  "tags": [],
+  "description": "Collection with base roles for every standard server",
+  "license": [
+   "MIT"
+  ],
+  "license_file": null,
+  "dependencies": {
+   "community.general": ">=3.0.0",
+   "ansible.posix": ">=1.4.0"
+  },
+  "repository": "https://github.com/lenhardt-its/ansible-collection-base",
+  "documentation": "https://github.com/lenhardt-its/ansible-collection-base",
+  "homepage": "https://lenhardt.cc",
+  "issues": "https://github.com/lenhardt-its/ansible-collection-base/issue"
+ },
+ "file_manifest_file": {
+  "name": "FILES.json",
+  "ftype": "file",
+  "chksum_type": "sha256",
+  "chksum_sha256": "2616162b67f1fdce32d2b633d22ef0dd9391c8ff7a134eb8bc2e75a7df654157",
+  "format": 1
+ },
+ "format": 1
+}
