@@ -1,0 +1,5 @@
+- name: "Reload systemd to adopt new fstab entries"
+  ansible.builtin.systemd:
+    daemon_reload: yes
+  tags:
+    - lvm

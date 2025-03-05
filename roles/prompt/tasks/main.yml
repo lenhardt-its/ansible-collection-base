@@ -1,0 +1,51 @@
+---
+- name: "Copy script for /etc/profile.d"
+  ansible.builtin.copy:
+    src: "../files/bashrc/{{ item }}"
+    dest: "/etc/profile.d/{{ item }}"
+    owner: root
+    group: root
+    mode: "0755"
+  with_items: "{{ prompt_profiled }}"
+  tags: prompt
+
+- name: "Copy files"
+  ansible.builtin.copy:
+    src: "../files/{{ item.source }}"
+    dest: "{{ item.dest }}"
+    owner: root
+    group: root
+    mode: "{{ item.mode }}"
+  register: __copy_files
+  with_items:
+    - source: "prompt/powerline-go-v{{ prompt_powerline_go_version }}-{{ ansible_system | lower }}-{{ ansible_architecture }}{{ '.exe' if ansible_system | lower == 'windows' else '' }}"
+      dest: "/usr/local/bin/powerline-go{{ '.exe' if ansible_system | lower == 'windows' else '' }}"
+      mode: "0755"
+    - source: "prompt/yq-v{{ prompt_yq_version }}-{{ ansible_system | lower }}-{{ ansible_architecture }}{{ '.exe' if ansible_system | lower == 'windows' else '' }}"
+      dest: "/usr/local/bin/yq{{ '.exe' if ansible_system | lower == 'windows' else '' }}"
+      mode: "0755"
+    - source: "prompt/bcrypt"
+      dest: "/usr/local/bin/bycrypt"
+      mode: "0755"
+    - source: "prompt/SourceCodePro.ttf"
+      dest: "/usr/share/fonts/SourceCodePro.ttf"
+      mode: "0644"
+    - source: bashrc/ms.sh
+      dest: "/root/.ms.sh"
+      mode: "0755"
+    - source: bashrc/tmux.conf
+      dest: "/root/.tmux.conf"
+      mode: "0644"
+    - source: bashrc/vimrc
+      dest: "/root/.vimrc"
+      mode: "0644"
+    - source: bashrc/gitconfig
+      dest: "/root/.gitconfig"
+      mode: "0644"
+  tags: prompt
+
+- name: "Update font cache"
+  ansible.builtin.command:
+    cmd: "fc-cache -fv"
+  when: __copy_files.changed
+  tags: prompt

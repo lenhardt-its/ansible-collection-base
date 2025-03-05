@@ -1,0 +1,16 @@
+---
+- name: Collect existing netplan configs
+  find:
+    paths: "{{ netplan_path }}"
+    patterns: "*.yaml,*.yml"
+  register: netplan_existing_configs
+  tags: network
+
+- name: Wipe existing netplan configs
+  become: true
+  file:
+    path: "{{ item['path'] }}"
+    state: absent
+  with_items: "{{ netplan_existing_configs['files'] }}"
+  when: item['path'] != netplan_path + "/" + netplan_file
+  tags: network

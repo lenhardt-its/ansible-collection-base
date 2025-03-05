@@ -1,0 +1,78 @@
+- name: "Combine lvm_config"
+  ansible.builtin.set_fact:
+    lvm_config: >-
+      {{
+        (defaults_lvm_config | default([])) +
+        (group_vars_lvm_config | default([])) +
+        (host_vars_lvm_config | default([])) +
+        (playbook_lvm_config | default([]))
+      | unique }}
+  tags: lvm
+
+# - name: "Debug lvm_config"
+#   ansible.builtin.debug:
+#     msg: "{{ lvm_config }}"
+#   tags:
+#     - lvm
+
+- name: "Install necessary packages"
+  ansible.builtin.package:
+    name:
+      - lvm2
+      - xfsprogs
+    state: present
+  tags: lvm
+
+- name: "Create volume groups"
+  community.general.lvg:
+    vg: "{{ item.vg }}"
+    pvs: "{{ item.pv }}"
+    force: "{{ item.force | default(false) }}"
+  loop: "{{ lvm_config }}"
+  tags: lvm
+
+- name: "Create logical volumes"
+  community.general.lvol:
+    vg: "{{ item.vg }}"
+    lv: "{{ lv.lv }}"
+    size: "{{ lv.size }}"
+  loop: "{{ lvm_config }}"
+  with_items: "{{ item.logical_volumes }}"
+  loop_control:
+    loop_var: lv
+  tags: lvm
+
+- name: "Create filesystems"
+  community.general.filesystem:
+    fstype: "{{ lv.fs_type | default('xfs') }}"
+    dev: "/dev/{{ item.vg }}/{{ lv.lv }}"
+  loop: "{{ lvm_config }}"
+  with_items: "{{ item.logical_volumes }}"
+  loop_control:
+    loop_var: lv
+  tags: lvm
+
+- name: "Create data folders"
+  ansible.builtin.file:
+    path: "{{ lv.mount }}"
+    state: directory
+    mode: "0755"
+  loop: "{{ lvm_config }}"
+  with_items: "{{ item.logical_volumes }}"
+  loop_control:
+    loop_var: lv
+  tags: lvm
+
+- name: "Mount the volumes"
+  ansible.builtin.mount:
+    path: "{{ lv.mount }}"
+    src: "/dev/{{ item.vg }}/{{ lv.lv }}"
+    fstype: "{{ lv.fs_type | default('xfs') }}"
+    opts: "{{ lv.opts | default('defaults') }}"
+    state: mounted
+  loop: "{{ lvm_config }}"
+  with_items: "{{ item.logical_volumes }}"
+  notify: "Reload systemd"
+  loop_control:
+    loop_var: lv
+  tags: lvm

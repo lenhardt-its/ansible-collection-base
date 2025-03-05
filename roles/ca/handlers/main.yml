@@ -1,0 +1,5 @@
+---
+- name: "Update truststore"
+  ansible.builtin.command:
+    cmd: "{{ ca_update }}"
+  tags: ca
