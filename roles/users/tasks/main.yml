@@ -32,13 +32,13 @@
 - name: "Create sudoer files"
   ansible.builtin.lineinfile:
     path: "/etc/sudoers.d/user_{{ item.name }}"
-    line: "{{ item.name }} {{ item.cmd }}"
+    line: "{{ item.name }} {{ item.cmd | default('ALL=(ALL) NOEXEC: /bin/false') }}"
     state: "{{ item.state }}"
     mode: "0440"
     create: true
     validate: 'visudo -cf %s'
   loop: "{{ users }}"
-  when: item.sudo is defined
+  when: (item.sudo | default(false)) and item.state == 'present'
   tags: users
 
 - name: "Remove sudoer files"
@@ -64,11 +64,10 @@
     owner: "{{ item.0.name }}"
     group: "{{ item.0.name }}"
     mode: "{{ item.1.mode }}"
-  # loop: "{{ users | subelements('bash_files') }}"
-  when: item.0.bash_files is defined
-  with_subelements: # "{{ users | subelements('authorized_keys') }}"
+  with_subelements:
     - "{{ users }}"
     - bash_files
+  when: (item.0.bash_files | default([]) | length) > 0
   tags:
     - users
     - bashrc

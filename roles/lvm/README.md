@@ -26,12 +26,12 @@ RHEL-based systems (Red Hat, CentOS, AlmaLinux, Rocky Linux)
 
 ## Variables
 
-`lvm_config`
+`host_vars_lvm_config`
 
 This variable defines the entire LVM configuration. The data is combined from multiple sources (defaults, group_vars, host_vars, playbook_vars). The structure is as follows:
 
-```bash
-lvm_config:
+l```yaml
+host_vars_lvm_config:
   - vg: system
     pv: /dev/vda
     logical_volumes:
@@ -46,14 +46,14 @@ lvm_config:
         fs_type: xfs
         opts: "noatime"
   - vg: content
-    pv: /dev/sdb
+    pv: /dev/vdb
     logical_volumes:
       - lv: data
-        size: 100%
+        size: 100G
         mount: /data
-        fs_type: xfs
+        fs_type: ext4
         opts: "defaults"
-````
+```
 
 ## Role Tasks
 
@@ -88,7 +88,7 @@ Playbook Example
   roles:
     - role: lvm_management
       vars:
-        lvm_config:
+        playbook_lvm_config:
           - vg: data_vg
             pv: /dev/sdb
             logical_volumes:

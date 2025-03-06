@@ -18,5 +18,12 @@
     mode: "0644"
   with_fileglob:
     - "{{ ca_source_path }}"
+  register: __ca_copy
   notify: Update truststore
+  tags: ca
+
+- name: "Update truststore"
+  ansible.builtin.command:
+    cmd: "{{ ca_update }}"
+  when: __ca_copy.changed
   tags: ca

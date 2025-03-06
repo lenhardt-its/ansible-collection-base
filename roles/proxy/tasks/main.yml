@@ -11,7 +11,7 @@
 - name: "Configure apt proxy"
   ansible.builtin.template:
     src: "templates/apt_proxy.j2"
-    dest: "/etc/apt/apt.conf.d/01proxy"
+    dest: "/etc/apt/apt.conf.d/90curtin-aptproxy"
     owner: root
     group: root
     mode: "0644"

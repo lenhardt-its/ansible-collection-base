@@ -40,17 +40,24 @@
   environment: "{{ proxy_env }}"
   tags: sshd
 
-- name: "Configure service"
+- name: "Configure client"
   ansible.builtin.template:
-    src: "{{ item.src }}"
-    dest: "{{ item.dest }}"
+    src: "ssh.config.j2"
+    dest: "/etc/ssh/ssh_config"
+    owner: root
+    group: root
+    mode: "0640"
+  notify: Restart sshd
+  tags: sshd
+
+- name: "Configure server"
+  ansible.builtin.template:
+    src: "sshd.config.j2"
+    dest: "/etc/ssh/sshd_config"
     owner: root
     group: root
     mode: "0640"
     validate: "/usr/sbin/sshd -t -f %s"
-  with_items:
-    - { src: ssh.config.j2, dest: /etc/ssh/ssh_config }
-    - { src: sshd.config.j2, dest: /etc/ssh/sshd_config }
   notify: Restart sshd
   tags: sshd
 
