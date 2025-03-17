@@ -42,3 +42,5 @@ defaults_sshd_server:
   PermitUserEnvironment: "no"
   MaxSessions: 10
   TCPKeepAlive: "yes"
+  ClientAliveInterval: 300
+  ClientAliveCountMax: 2
