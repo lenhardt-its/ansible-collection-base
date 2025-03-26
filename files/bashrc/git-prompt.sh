@@ -45,10 +45,20 @@ parse_git_branch() {
 
 # Prompt setzen mit parse_git_branch korrekt eingebunden
 set_bash_prompt() {
-  local user_color
+  local user_color exit_str=""
   [[ $EUID -eq 0 ]] && user_color="${PS1_RED}" || user_color="${PS1_GREEN}"
 
-  PS1="${user_color}\u${PS1_RESET}@${PS1_BLUE}\h${PS1_RESET}:${PS1_CYAN}\w${PS1_RESET}\$(parse_git_branch)\n\$ "
+  # Zeit und Datum
+  local now="\$(date +'%F %T')"  # z. B. "2025-03-26 14:30:12"
+  local now_str="${PS1_YELLOW}[${now}]${PS1_RESET}"
+
+  # Exit-Code (nur wenn != 0)
+  local last_exit=$?
+  if [[ $last_exit -ne 0 ]]; then
+    exit_str="${PS1_RED}✖${last_exit}${PS1_RESET} "
+  fi
+
+  PS1="${now_str} ${exit_str}${user_color}\u${PS1_RESET}@${PS1_BLUE}\h${PS1_RESET}:${PS1_CYAN}\w${PS1_RESET}\$(parse_git_branch)\n\$ "
 }
 
 PROMPT_COMMAND=set_bash_prompt
