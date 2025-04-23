@@ -33,9 +33,9 @@
 
 - name: "Create logical volumes"
   community.general.lvol:
-    vg: "{{ item.0.vg }}"
-    lv: "{{ item.1.lv }}"
-    size: "{{ item.1.size }}"
+    vg: "{{ lv.0.vg }}"
+    lv: "{{ lv.1.lv }}"
+    size: "{{ lv.1.size }}"
   loop: "{{ lvm_config | subelements('logical_volumes') }}"
   loop_control:
     loop_var: lv
